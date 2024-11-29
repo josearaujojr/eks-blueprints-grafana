@@ -1,0 +1,23 @@
+fullnameOverride: loki
+
+config:
+  storage_config:
+    filesystem:
+      directory: /data/loki/chunks
+
+persistence:
+  enabled: true
+  storageClassName: gp2
+  size: 10Gi
+
+serviceAccount:
+  create: true
+  name: loki
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
