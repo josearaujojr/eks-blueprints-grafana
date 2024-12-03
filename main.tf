@@ -25,14 +25,14 @@ module "eks_blueprints" {
 
   cluster_name = local.name
 
-  # config obrigatória do VPC e Subnet do cluster EKS
+  # Configuração obrigatória do VPC e Subnet do cluster EKS
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
-  # var do plano de controle do EKS
+  # Variável do plano de controle do EKS
   cluster_version = local.cluster_version
 
-  # list de funções adicionais com permissões de administrador no cluster
+  # Lista de funções adicionais com permissões de administrador no cluster
   map_roles = [
     {
       rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/TeamRole"
@@ -45,14 +45,20 @@ module "eks_blueprints" {
       groups   = ["system:masters"]
     },
     {
-      rolearn  = "arn:aws:iam::${local.account_id}:role/Karpenter-eks-lab-20241129133220475000000004"
+      rolearn  = "arn:aws:iam::${local.account_id}:role/KarpenterNodeRole-${local.name}"
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = ["system:bootstrappers", "system:nodes"]
     }
   ]
 
-  # list de usuários mapeados
+  # Lista de usuários mapeados
   map_users = [
+    # Permissões administrativas para o criador do cluster
+    {
+      userarn  = data.aws_caller_identity.current.arn
+      username = "cluster-creator"
+      groups   = ["system:masters"]
+    },
     {
       userarn  = data.aws_caller_identity.current.arn
       username = local.username_1
@@ -70,24 +76,8 @@ module "eks_blueprints" {
     }
   ]
 
-  # EKS MANAGED NODE GROUPS
+  # EKS Managed Node Groups
   managed_node_groups = {
-    #    T3A_MICRO = {
-    #      node_group_name = local.node_group_name
-    #      instance_types  = ["t3a.micro"]
-    #      subnet_ids      = module.vpc.private_subnets
-    #      min_size     = 2
-    #      max_size     = 10
-    #      desired_size = 6
-    #    },
-    #    T3_MICRO = {
-    #      node_group_name = local.node_group_name_2
-    #      instance_types  = ["t3.micro"]
-    #      subnet_ids      = module.vpc.private_subnets
-    #      min_size     = 2
-    #      max_size     = 10
-    #      desired_size = 6
-    #    },
     T3_MEDIUM = {
       node_group_name = local.node_group_name
       instance_types  = ["t3.medium"]
@@ -98,7 +88,7 @@ module "eks_blueprints" {
     }
   }
 
-  # teams
+  # Teams
   platform_teams = {
     admin = {
       users = [
@@ -110,6 +100,7 @@ module "eks_blueprints" {
 
   tags = local.tags
 }
+
 
 # VPC
 
