@@ -43,11 +43,6 @@ module "eks_blueprints" {
       rolearn  = "arn:aws:iam::${local.account_id}:role/eks-admin"
       username = "eks-admin"
       groups   = ["system:masters"]
-    },
-    {
-      rolearn  = "arn:aws:iam::${local.account_id}:role/Karpenter-eks-lab-20241129133220475000000004"
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups   = ["system:bootstrappers", "system:nodes"]
     }
   ]
 
